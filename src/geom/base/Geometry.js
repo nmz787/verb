@@ -1,4 +1,4 @@
-// ###new NurbsGeometry()
+// ###new Geometry()
 //
 // Constructor for Geometry
 //

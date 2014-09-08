@@ -16,6 +16,7 @@ module.exports = function(grunt) {
                                         'src/geom/base/NurbsCurve.js', 
                                         'src/geom/base/NurbsSurface.js', 
                                         'src/geom/*.js', 
+                                        'src/topo/*.js', 
                                         'src/intersect/*.js', 
                                         'src/eval/intersect.js',
                                         'src/eval/tesselate.js',

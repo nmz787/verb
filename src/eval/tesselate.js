@@ -374,14 +374,68 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 
 verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1, options ){
 
-	var eval_srf = verb.eval.nurbs.rational_surface_point
-		, u_half_step = (u[1] - u[0] / 2) * ( Math.random() * 0.1 + 1 )
-		, v_half_step = (v[1] - v[0] / 2) * ( Math.random() * 0.1 + 1 )
-		, p1 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[0], v[0] )
-		, p2 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[0] + u_half_step, v[0] + v_half_step )
-		, p3 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[1], v[1] );
+	var max_crv_diff = options.maxCurvatureDifference || 0.01;
 
-	return verb.eval.nurbs.three_points_are_flat( p1, p2 , p3, tol );
+	// get curvature at all corners of the surface
+	var type = "gaussian";
+
+	var a = verb.eval.nurbs.rational_surface_curvature( srf.degree_u, 
+																											srf.knots_u, 
+																											srf.degree_v, 
+																											srf.knots_v, 
+																											srf.homo_control_points, 
+																											u0, v0 );
+
+	var b = verb.eval.nurbs.rational_surface_curvature( srf.degree_u, 
+																											srf.knots_u, 
+																											srf.degree_v, 
+																											srf.knots_v, 
+																											srf.homo_control_points, 
+																											u1, v0 );
+
+	var c = verb.eval.nurbs.rational_surface_curvature( srf.degree_u, 
+																											srf.knots_u, 
+																											srf.degree_v, 
+																											srf.knots_v, 
+																											srf.homo_control_points, 
+																											u1, v1 );
+
+	var d = verb.eval.nurbs.rational_surface_curvature( srf.degree_u, 
+																											srf.knots_u, 
+																											srf.degree_v, 
+																											srf.knots_v, 
+																											srf.homo_control_points, 
+																											u0, v1 );
+
+	var e = verb.eval.nurbs.rational_surface_curvature( srf.degree_u, 
+																											srf.knots_u, 
+																											srf.degree_v, 
+																											srf.knots_v, 
+																											srf.homo_control_points, 
+																											(u0 + u1) / 2, (v0 + v1) / 2 );
+
+	var curvatures = [ a.mean, b.mean, c.mean, d.mean, e.mean ];
+	var points = [ a.point, b.point, c.point, d.point, e.point ];
+
+	// if any of the curvatures are greater than threshold - return false
+	for (var i = 0; i < 5; i++){
+		for (var j = i+1; j < 5; j++){
+			if ( Math.abs( curvatures[i] - curvatures[j] ) > curvatureDifference ){
+				return false;
+			}
+		}
+	}
+
+	return true;
+
+	// var eval_srf = verb.eval.nurbs.rational_surface_point
+	// 	, u_half_step = (u[1] - u[0] / 2) * ( Math.random() * 0.1 + 1 )
+	// 	, v_half_step = (v[1] - v[0] / 2) * ( Math.random() * 0.1 + 1 )
+	// 	, p1 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[0], v[0] )
+	// 	, p2 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[0] + u_half_step, v[0] + v_half_step )
+	// 	, p3 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[1], v[1] );
+
+	// return verb.eval.nurbs.three_points_are_flat( p1, p2 , p3, tol );
 
 }
 
@@ -597,7 +651,9 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( option
 
 	if ( ( options.minDepth && currentDepth < options.minDepth ) ){
 		return true;
-	} else if ( this.srf && !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options ) ){
+	}
+
+	if ( this.srf && !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options ) ){
 		return true;
 	}
 

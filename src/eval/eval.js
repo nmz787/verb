@@ -20,18 +20,6 @@
 
 verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, u, v ) {
 
-	// compute the first fundamental form
-
-		// symmetric matrix where
-		//
-		// I = [ E F; F G ]
-		//
-		// where:
-		//
-		// E = Xu * Xu
-		// F = Xu * Xv
-		// G = Xv * Xv
-
 	// second fundamental form (shape operator)
 
 		// symmetric matrix where
@@ -47,20 +35,17 @@ verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree
 	// principal curvatures are the eigenvalues of the second fundamental form
 
 	var derivs = verb.eval.nurbs.rational_surface_derivs( 	degree_u, 
-															knots_u, 
-															degree_v, 
-															knots_v, 
-															homo_control_points, 
-															2, u, v );
-
-	console.log(derivs)
+																													knots_u, 
+																													degree_v, 
+																													knots_v, 
+																													homo_control_points, 
+																													2, u, v );
 
 	// structure of the derivatives
 
-	// pos  du  vuu
-	// dv   duv
+	// pos  du  vuu 
+	// dv   duv 
   // dvv 
-
  
   var du = derivs[0][1];
   var dv = derivs[1][0];
