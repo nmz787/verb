@@ -45,6 +45,9 @@
 
 			verb.init();
 
+
+			
+			
 			var degree = 3
 				, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
 				, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
@@ -85,6 +88,12 @@
 		var d1 = Date.now();
 
 		for (var i = 0; i < 1; i++){
+
+			// var mesh = verb.eval.nurbs.tessellate_rational_surface_uniform_cubic( srf.get('degreeU'),
+			// 	srf.get('knotsU'),
+			// 	srf.get('degreeV'),
+			// 	srf.get('knotsV'), 
+			// 	srf.homogenize(), 4 );
 
 			var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
 				srf.get('knotsU'),
