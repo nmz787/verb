@@ -1,5 +1,7 @@
 var angleX = 20;
 var angleY = 20;
+var x = 0;
+var y = 0;
 var viewers = [];
 
 // Set to true so lines don't use the depth buffer
@@ -74,17 +76,47 @@ function Viewer(ele, width, height, depth, async) {
   var that = this;
 
   gl.onmousemove = function(e) {
+    
     if (e.dragging) {
-      angleY += e.deltaX * 2;
-      angleX += e.deltaY * 2;
-      angleX = Math.max(-90, Math.min(90, angleX));
+      if (e.ctrlKey) {
+        x+=e.deltaX/100;
+        y+=e.deltaY/100;
+        //x=e.layerX;
+        //y=e.layerY;
+      } else{
+          console.log(angleY);
+        if (angleY>2*Math.pi){
 
+          console.log('maxed Y');
+          angleY=0;
+        }
+        if (angleX>2*Math.pi) {
+          console.log('maxed X');
+          angleX=0;
+        }
+        angleY += e.deltaX * 2;
+        angleX += e.deltaY * 2;
+        angleX = Math.max(-90, Math.min(90, angleX));
+      }
       viewers.map(function(viewer) {
         viewer.gl.ondraw();
       });
     }
   };
 
+
+  gl.onmousewheel = function(e) {
+    //console.log(e.CLICK);
+    //console.log(e);
+
+      
+      depth += e.wheelDeltaY/120;
+
+      viewers.map(function(viewer) {
+        viewer.gl.ondraw();
+      });
+
+  };
   
   gl.ondraw = function() {
 
@@ -92,7 +124,9 @@ function Viewer(ele, width, height, depth, async) {
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.loadIdentity();
-    gl.translate(0, 0, -depth);
+    gl.rotate(0, 1, 0, 0);
+    gl.rotate(0, 0, 1, 0);
+    gl.translate(x, y, depth);
     gl.rotate(angleX, 1, 0, 0);
     gl.rotate(angleY, 0, 1, 0);
 
